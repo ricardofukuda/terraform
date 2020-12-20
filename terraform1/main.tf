@@ -2,16 +2,16 @@
 
 
 resource "aws_instance" "backend" {
-  ami = "ami-0885b1f6bd170450c" #ubuntu 20.04 LTS
+  ami           = "ami-0885b1f6bd170450c" #ubuntu 20.04 LTS
   instance_type = "t2.nano"
-  key_name = "ricardo-key"
+  key_name      = "ricardo-key"
   #key_name = aws_key_pair.backend_key.ricardo_key
   availability_zone = "us-east-1a" #public subnet
 
   security_groups = [
     aws_security_group.backend.name
   ]
-              
+
   tags = {
     Name = "backend-${terraform.workspace}"
   }
@@ -20,7 +20,7 @@ resource "aws_instance" "backend" {
     cpu_credits = "standard"
   }
 
-  lifecycle{
+  lifecycle {
     create_before_destroy = true
   }
 }
@@ -51,18 +51,18 @@ resource "aws_security_group" "backend" {
   public_key = "~/ricardo-key.pub"
 }*/
 
-resource "null_resource" "prov_null"{
+resource "null_resource" "prov_null" {
   triggers = {
     public_ip = aws_instance.backend.public_ip
   }
 
   connection {
-    host = aws_instance.backend.public_ip
+    host        = aws_instance.backend.public_ip
     private_key = file("~/.ssh/ricardo.pem")
-    user = "ubuntu"
+    user        = "ubuntu"
   }
 
   provisioner "remote-exec" {
-    inline = ["sudo apt-get update", "sudo apt-get install vim -y"]
+    inline = ["sudo apt-get update"]
   }
 }
