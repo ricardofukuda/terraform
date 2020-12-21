@@ -4,7 +4,7 @@
 resource "aws_instance" "backend" {
   ami           = "ami-0885b1f6bd170450c" #ubuntu 20.04 LTS
   instance_type = "t2.nano"
-  key_name      = "ricardo-key"
+  key_name      = aws_key_pair.ssh.ricardo-key
   #key_name = aws_key_pair.backend_key.ricardo_key
   availability_zone = "us-east-1a" #public subnet
 
@@ -63,6 +63,7 @@ resource "null_resource" "prov_null" {
   }
 
   provisioner "remote-exec" {
-    inline = ["sudo apt-get update"]
+    //inline = ["sudo apt-get update", "sudo apt-get install openjdk-8-jre -y", "sudo apt-get -y install python"]
+    inline = []
   }
 }
