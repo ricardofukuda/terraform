@@ -1,9 +1,9 @@
 
 // Provides a resource to create a new launch configuration, used for autoscaling groups.
 resource "aws_launch_configuration" "aws-launch"{
-  name = "aws-launch"
-  image_id = "ami-0885b1f6bd170450c"
-  instance_type = "t2.nano"
+  name = var.aws_launchconfig_name
+  image_id = var.aws_image_name
+  instance_type = var.aws_instance_type
   associate_public_ip_address = true
   key_name = "ricardo-key"
   security_groups = [aws_security_group.awsfw.id]
