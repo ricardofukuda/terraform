@@ -1,3 +1,17 @@
+terraform {
+  /*backend "local" {
+    path = "./state/localstate.tfstate"
+  }*/
+
+  backend "s3" {
+    bucket = "fukudatfstate"
+    key = "state.tfstate"
+    region = "us-east-1"
+    //dynamodb_table = "locktablename" if you are using the state locking
+  }
+}
+
+
 
 // Provides a resource to create a new launch configuration, used for autoscaling groups.
 resource "aws_launch_configuration" "aws-launch"{
@@ -17,11 +31,27 @@ echo "<BR><BR>Terraform autoscaled app multi-cloud lab<BR><BR>" >> /var/www/html
 EOF
 }
 
+locals{
+  ingress_config = [{
+    from_port = 80
+    to_port = 80
+    description = "web port"
+    cidr = ["0.0.0.0/0"]
+    protocol = "tcp"
+  },
+  {
+    from_port = 22
+    to_port = 22
+    description = "ssh port"
+    cidr = ["0.0.0.0/0"]
+    protocol = "tcp"
+  }]
+}
 
 resource "aws_security_group" "awsfw" {
   name = "aws-fw"
   vpc_id = aws_vpc.tfvpc.id //todo
-  ingress {
+  /*ingress {
     description = "value"
     cidr_blocks = ["0.0.0.0/0"]
     from_port = 80
@@ -35,6 +65,17 @@ resource "aws_security_group" "awsfw" {
     from_port = 22
     protocol = "tcp"
     to_port = 22
+  }*/
+
+  dynamic "ingress"{
+    for_each = local.ingress_config
+    content{
+      description = ingress.value.description
+      cidr_blocks = ingress.value.cidr
+      from_port = ingress.value.from_port
+      protocol = ingress.value.protocol
+      to_port = ingress.value.to_port
+    }
   }
 
   egress {

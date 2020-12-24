@@ -17,3 +17,17 @@ variable "aws_instance_type" {
   default = "t2.nano"
   type = string
 }
+
+// data sources to get infos from provider
+data "aws_ami" "amazonlinux"{
+  owners = ["amazon"]
+  most_recent = true
+  filter{
+    name = "name"
+    values = ["amzn2-ami-hvm-2.0*"]
+  }
+  filter{
+    name = "architecture"
+    values = ["x86*"]
+  }
+}
